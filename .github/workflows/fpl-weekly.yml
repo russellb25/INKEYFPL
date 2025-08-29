@@ -1,0 +1,30 @@
+name: FPL weekly to Slack
+
+on:
+  schedule:
+    # Run every Tuesday at 09:00 London time
+    - cron: "0 8 * * TUE"  # 08:00 UTC ~ 09:00 London when BST is active
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Run bot
+        env:
+          FPL_LEAGUE_ID: ${{ secrets.FPL_LEAGUE_ID }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+          LOCAL_TZ: Europe/London
+        run: python fpl_slack_bot.py
